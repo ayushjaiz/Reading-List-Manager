@@ -55,25 +55,6 @@ export const addBook = async (bookData: BookData) => {
     }
 };
 
-// export const updateStatus = async (id: number, status: Status) => {
-//     try {
-//         const updatedBook = await prisma.book.update({
-//             where: { id },
-//             data: { status },
-//             select: {
-//                 id: true,
-//                 name: true,
-//                 author: true,
-//                 status: true,
-//             }
-//         });
-//         return updatedBook;
-//     } catch (error) {
-//         console.error('Error updating book status:', error);
-//         throw new Error('Failed to update book status');
-//     }
-// };
-
 export const updateBook = async (
     bookID: number,
     userID: number,

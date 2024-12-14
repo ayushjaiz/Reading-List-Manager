@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Book } from '@/types/book';
 
-// Utility to safely format a date as 'YYYY-MM-DD'
 const formatDate = (date: Date | string | undefined): string => {
     if (!date) return '';
     const parsedDate = typeof date === 'string' ? new Date(date) : date;
@@ -24,7 +23,6 @@ const EditBookDialog = ({ book, onClose, onSave }: EditBookDialogProps) => {
         finishDate: formatDate(book.finishDate),
     });
 
-    // Handle form changes, including dates
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -33,7 +31,6 @@ const EditBookDialog = ({ book, onClose, onSave }: EditBookDialogProps) => {
         }));
     };
 
-    // Handle save, converting date strings back to Date objects
     const handleSave = () => {
         const cleanedData: Book = {
             ...formData,

@@ -10,7 +10,6 @@ export function BookDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
 
-  // Fetch books
   async function getBooks() {
     setLoading(true);
     setError(null);
@@ -35,7 +34,6 @@ export function BookDashboard() {
     }
   }
 
-  // Add a new book
   const handleAddBook = async (newBook: Book) => {
     try {
       const response = await fetch('http://localhost:3001/api/books/add', {
@@ -58,7 +56,6 @@ export function BookDashboard() {
     }
   };
 
-  // Handle delete action
   const handleDelete = async (bookId: string) => {
     try {
       const response = await fetch(`http://localhost:3001/api/books/${bookId}`, {
@@ -70,7 +67,6 @@ export function BookDashboard() {
         throw new Error('Failed to delete book');
       }
 
-      // Reload books after deletion
       getBooks();
       console.log("Book deleted sucessfully")
     } catch (err) {
@@ -79,7 +75,6 @@ export function BookDashboard() {
     }
   };
 
-  // Handle edit action
   const handleEdit = async (updatedBook: Book) => {
     try {
       const response = await fetch(`http://localhost:3001/api/books/${updatedBook.id}`, {
@@ -93,7 +88,7 @@ export function BookDashboard() {
         throw new Error('Failed to update book');
       }
 
-      // Reload books after update
+      // Reload 
       getBooks();
       console.log("Book updated sucessfully")
     } catch (err) {
@@ -102,7 +97,6 @@ export function BookDashboard() {
     }
   };
 
-  // Fetch books on mount
   useEffect(() => {
     getBooks();
   }, []);
