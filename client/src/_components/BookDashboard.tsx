@@ -1,61 +1,142 @@
-import { useQuery } from '@tanstack/react-query';
-import { Book } from '../types/book'
-import { DataTable } from './DataTable'
-import { columns } from './colums'
-import { Button } from '@/components/ui/button'
-import { ReloadIcon } from '@radix-ui/react-icons'
+import { Button } from '@/components/ui/button';
+import { Book } from '../types/book';
+import BookTable from './BookTable';
+import { useEffect, useState } from 'react';
+import AddBookDialog from './AddBookDialog';
 
-// Fetch books with cookies
-async function getBooks(): Promise<Book[]> {
-  const response = await fetch('http://localhost:3001/api/books', {
-    method: 'GET',
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch books');
-  }
-
-  return response.json();
-}
-
-// Inside your component
 export function BookDashboard() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
 
-  // Query books
-  const { data: books, isLoading, isError, refetch } = useQuery<Book[]>({
-    queryKey: ['books'],
-    queryFn: getBooks,
-  });
+  // Fetch books
+  async function getBooks() {
+    setLoading(true);
+    setError(null);
 
-  if (isError) {
-    return <div>Error loading books. Please try again.</div>;
+    try {
+      const response = await fetch('http://localhost:3001/api/books', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch books');
+      }
+
+      const fetchedBooks = await response.json();
+      setBooks(fetchedBooks);
+    } catch (err) {
+      console.error(err);
+      setError((err as Error).message || 'An unknown error occurred');
+    } finally {
+      setLoading(false);
+    }
   }
+
+  // Add a new book
+  const handleAddBook = async (newBook: Book) => {
+    try {
+      const response = await fetch('http://localhost:3001/api/books/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newBook),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add book');
+      }
+
+      getBooks();
+      setIsAddDialogOpen(false);
+      console.log('Book added successfully');
+    } catch (err) {
+      console.error(err);
+      setError((err as Error).message || 'Failed to add book');
+    }
+  };
+
+  // Handle delete action
+  const handleDelete = async (bookId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/books/${bookId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete book');
+      }
+
+      // Reload books after deletion
+      getBooks();
+      console.log("Book deleted sucessfully")
+    } catch (err) {
+      console.error(err);
+      setError((err as Error).message || 'Failed to delete book');
+    }
+  };
+
+  // Handle edit action
+  const handleEdit = async (updatedBook: Book) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/books/${updatedBook.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updatedBook),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update book');
+      }
+
+      // Reload books after update
+      getBooks();
+      console.log("Book updated sucessfully")
+    } catch (err) {
+      console.error(err);
+      setError((err as Error).message || 'Failed to update book');
+    }
+  };
+
+  // Fetch books on mount
+  useEffect(() => {
+    getBooks();
+  }, []);
 
   return (
     <main className="min-h-screen bg-background px-52">
       <div className="container mx-auto py-10">
         <h1 className="text-2xl font-bold mb-5">Book Dashboard</h1>
-        <div className="flex justify-end items-center mb-4">
 
-          <Button onClick={() => refetch()} disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
-              </>
-            ) : (
-              'Add Book'
-            )}
-          </Button>
+        <div className="flex justify-end items-center mb-4">
+          <Button onClick={() => setIsAddDialogOpen(true)}>Add Book</Button>
         </div>
-        {isLoading ? (
-          <div>Adding books...</div>
-        ) : (
-          <DataTable columns={columns} data={books || []} />
+
+        {/* Loading State */}
+        {loading && <div className="text-center font-medium">Loading books...</div>}
+
+        {/* Error State */}
+        {error && <div className="text-center text-red-500 font-medium">Error: {error}</div>}
+
+        {/* Book Table */}
+        {!loading && !error && books.length > 0 && (
+          <BookTable books={books} onEdit={handleEdit} onDelete={handleDelete} />
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && books.length === 0 && (
+          <div className="text-center text-gray-500 font-medium">No books available.</div>
         )}
       </div>
+
+      {/* Add Book Dialog */}
+      {isAddDialogOpen && (
+        <AddBookDialog onClose={() => setIsAddDialogOpen(false)} onSave={handleAddBook} />
+      )}
     </main>
   );
 }
-

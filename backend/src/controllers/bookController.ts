@@ -24,9 +24,9 @@ export const addBook = async (req: Request, res: Response) => {
             name,
             author,
             status,
-            startDate: new Date(startDate) || null,
-            finishDate: new Date(finishDate) || null,
-            userID
+            userID,
+            ...(startDate && { startDate: new Date(startDate) }), // Add startDate if it exists
+            ...(finishDate && { finishDate: new Date(finishDate) }), // Add finishDate if it exists
         };
 
         const newBook = await BookModel.addBook(bookData);
@@ -72,7 +72,7 @@ export const updateBook = async (req: Request, res: Response) => {
             return;
         }
 
-        res.status(200).json(updatedBook);
+        res.status(200).json({ message: "Book edited sucessfully", updatedBook });
     } catch (error) {
         console.error("Error in updateBook controller:", error);
         res.status(500).json({ error: "Failed to update book" });
@@ -86,7 +86,7 @@ export const getAllBooks = async (req: Request, res: Response) => {
         console.log(userID);
 
         const books = await BookModel.getAllBooksByUserID(Number(userID));
-        console.log(books);
+        // console.log(books);
         res.status(200).json(books);
     } catch (error) {
         console.error("Error in deleteBook controller:", error);
@@ -97,7 +97,7 @@ export const getAllBooks = async (req: Request, res: Response) => {
 
 export const deleteBook = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        const id = parseInt(req.params.id, 10);
 
         if (!id) {
             res.status(400).json({ error: "Missing required field: id" });
@@ -105,7 +105,7 @@ export const deleteBook = async (req: Request, res: Response) => {
         }
 
         const deletedBook = await BookModel.deleteBook(Number(id));
-        res.status(200).json(deletedBook);
+        res.status(200).json({ message: "Book Deleted Sucessfully", deletedBook });
     } catch (error) {
         console.error("Error in deleteBook controller:", error);
         res.status(500).json({ error: "Failed to delete book" });
@@ -114,7 +114,7 @@ export const deleteBook = async (req: Request, res: Response) => {
 
 
 const validateDates = (status: string, startDate?: string, finishDate?: string): string | null => {
-    if (!(status === Status.COMPLETED || status === Status.COMPLETED || status === Status.COMPLETED)) {
+    if (!(status === Status.COMPLETED || status === Status.IN_PROGRESS || status === Status.TO_READ)) {
         return "Invalid book status";
     }
 
