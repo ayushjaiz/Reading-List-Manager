@@ -25,8 +25,8 @@ export const addBook = async (req: Request, res: Response) => {
             author,
             status,
             userID,
-            ...(startDate && { startDate: new Date(startDate) }), // Add startDate if it exists
-            ...(finishDate && { finishDate: new Date(finishDate) }), // Add finishDate if it exists
+            ...(startDate && { startDate: new Date(startDate) }),
+            ...(finishDate && { finishDate: new Date(finishDate) }),
         };
 
         const newBook = await BookModel.addBook(bookData);

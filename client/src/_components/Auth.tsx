@@ -44,7 +44,7 @@ export function Auth() {
         try {
             const promise = axios.post(endpoint, formData, { withCredentials: true });
 
-            // Toast messages during submission
+            // Toast message
             await toast.promise(promise, {
                 loading: 'Submitting...',
                 success: isLogin

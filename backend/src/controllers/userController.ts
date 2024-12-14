@@ -10,15 +10,12 @@ export const getUserProfile = async (req: Request, res: Response) => {
     }
 
     try {
-        // Fetch the user details from the database
         const user = await getUserById(userId)
 
         if (!user) {
             res.status(404).json({ message: "User not found" });
             return;
         }
-
-        // Send back the full details of the user
         res.status(200).json({
             message: "User Profile",
             user,

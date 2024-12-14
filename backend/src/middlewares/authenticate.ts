@@ -20,8 +20,8 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   }
 
   try {
-    const decoded = verifyToken(token); // Decode and verify the JWT token
-    req.user = decoded as any; // Attach the decoded user info to the request object
+    const decoded = verifyToken(token)
+    req.user = decoded as any; // Attach the decoded user
     next();
   } catch (err) {
     res.status(403).json({ message: "Invalid token" });

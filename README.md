@@ -26,7 +26,7 @@ Reading  List Manger project is a full stack project where user can sign in and 
 
 - **Backend**: NodeJs, Express, Typescript
 - **Database**: Postgres, Redis
-- **Frontend**: React, Typescript
+- **Frontend**: React, Typescript, Redux
 
 ---
 
