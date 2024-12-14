@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { store } from "./store/appStore";
 import { BookDashboard } from "./_components/BookDashboard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ProtectedRoute from "./ProtectedRoute";
 
 const App = () => {
   const queryClient = new QueryClient()
@@ -14,11 +15,11 @@ const App = () => {
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <Routes>
-            <Route path="/dashboard" element={<BookDashboard />} />
+            {/* <Route path="/dashboard" element={<BookDashboard />} /> */}
             <Route path="/" element={<Auth />} />
-            {/* <Route element={<ProtectedRoute />}>
-                  <Route path="/browse" element={<BrowsePage />} />
-                </Route> */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<BookDashboard />} />
+            </Route>
           </Routes>
         </QueryClientProvider>
       </BrowserRouter>
@@ -27,24 +28,5 @@ const App = () => {
 };
 
 export default App;
-
-
-
-// export const App = () => {
-//   return (
-//         <BrowserRouter>
-//           <Routes>
-//             <Route path="/dashboard" element={<Dashboard />} />
-//             <Route path="/" element={<Auth />} />
-//             {/* <Route element={<ProtectedRoute />}>
-//               <Route path="/browse" element={<BrowsePage />} />
-//             </Route> */}
-//           </Routes>
-//         </BrowserRouter>
-//   );
-// };
-
-// const root = createRoot(document.getElementById("root")!);
-// root.render(<App />);
 
 
